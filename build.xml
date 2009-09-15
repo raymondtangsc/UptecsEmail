@@ -1,0 +1,59 @@
+<?xml version="1.0"?> 
+<project name="UptecsEmail" default="all" basedir="."> 
+
+     <property name="jarname" value="UptecsEmail"/> 
+     <property name="src" value="src"/> 
+     <property name="build" value="build"/>
+     <property name="dist" value="dist"/>
+     <property name="docs" value="docs"/>
+
+    <target name="all" depends="compile, jar, docs"/>
+
+     <target name="compile">
+          <mkdir dir="${build}"/>
+          <javac srcdir="${src}" destdir="${build}"/> 
+     </target>
+
+
+  <target name="docs" depends="compile">
+    <delete dir="${docs}" quiet="true"/>
+    <mkdir dir="${docs}"/>
+    <javadoc packagenames="org.*"
+           sourcepath="${src}"
+           defaultexcludes="yes"
+           destdir="${docs}"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Test CC Docs">
+    <packageset dir="src" defaultexcludes="yes">
+      <include name="**/*.java"/>
+    </packageset>
+   </javadoc>
+  </target>
+
+  <target name="clean" description="Removes previous build">
+    <delete verbose="true" includeemptydirs="true">
+      <fileset dir="${build}"/>
+      <fileset dir="${dist}"/>
+      <fileset dir="${docs}"/>
+    </delete>
+  </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${dist}"/>
+	<jar jarfile="${dist}/${jarname}.jar"
+		basedir="${build}"
+		excludes="**/examples/**"
+		/>
+    </target>
+
+    <target name="sf" depends="jar">
+      <exec executable="scp">
+           <arg value="${dist}/${jarname}.jar"/>
+           <arg value="jacobrhoden@shell.sf.net:/home/groups/s/sm/smsgate/htdocs/jars/"/>
+      </exec>
+    </target>
+
+</project>
+
