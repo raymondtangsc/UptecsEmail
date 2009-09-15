@@ -39,21 +39,21 @@ public class ImapReader {
     static OutputStreamWriter outStream=null;
     static InputStream inStream=null;
     static BufferedReader reader=null;
-    
+
     private String host="";
     private int port=143;       // USe 993 for SSL;
     private String username="";
     private String password="";
     private int command=1;
     private boolean ssh=false;
-    
+
     /**
      * Specify the host name to connect to.
      */
     public void setHostname(String h) {
         host=h;
     }
-    
+
     /**
      * Specify the user name to be used for this transaction.
      *
@@ -62,7 +62,7 @@ public class ImapReader {
     public void setUsername(String u) {
         username=u;
     }
-    
+
     /**
      * Specify the password to be used with this transaction.
      * @param p The password to use for this connection.
@@ -70,7 +70,7 @@ public class ImapReader {
     public void setPassword(String p) {
         password=p;
     }
-    
+
     /**
      * Initiate connection to the server
      */
@@ -79,7 +79,7 @@ public class ImapReader {
         String line=null;
         Random r=new Random();
         command=Math.abs(r.nextInt()%1000000);
-        
+
         try {
             if(ssh==true) {
             /*
@@ -97,7 +97,7 @@ public class ImapReader {
                                 authType) { }
                     }
                 };
-                
+
                 // Install the all-trusting trust manager
                 try {
                     sc = SSLContext.getInstance("SSL");
@@ -106,19 +106,19 @@ public class ImapReader {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                
+
                 // connect with the IMAP server
                 SocketFactory socketFactory = sc.getSocketFactory();
                 imap=socketFactory.createSocket(host, port);
             } else {
                 imap=new Socket(host,143);
             }
-            
+
             outStream=new OutputStreamWriter(imap.getOutputStream());
             inStream = imap.getInputStream();
             reader = new BufferedReader(new
                     java.io.InputStreamReader(inStream));
-            
+
             line=readLine();
             if(!line.substring(0,4).equalsIgnoreCase("* OK") ) { return 2; }
             write("LOGIN "+username+" "+password);
@@ -130,7 +130,7 @@ public class ImapReader {
         }
         return 0;
     }
-    
+
     /**
      *  Marks a message as deleted/ready for deletion.
      *
@@ -143,7 +143,7 @@ public class ImapReader {
             line=readLine();
         }
     }
-    
+
     /**
      * Flushes all email messages that are marked for deletion.
      */
@@ -154,9 +154,9 @@ public class ImapReader {
             line=readLine();
         }
     }
-    
+
     private Pattern endcheck=Pattern.compile("J(\\d+) OK.*");
-    
+
     /**
      * Read contents of a particular email. May only be called after
      * first using the readMailbox function to select which mail folder
@@ -167,7 +167,7 @@ public class ImapReader {
      */
     public EmailMessage readMail(int id) throws IOException {
         StringBuffer content=new StringBuffer();
-        
+
         write("fetch "+id+" body[header]");
         String line=readLine();
         EmailMessage e=new EmailMessage();
@@ -185,7 +185,7 @@ public class ImapReader {
             line=readLine();
         }
         e.setHeaders(content.toString());
-        
+
         content=new StringBuffer();
         write("fetch "+id+" body[text]");
         line=readLine(); //Skip first line, its just the command response
@@ -202,11 +202,10 @@ public class ImapReader {
         String data=content.toString();
         data=data.substring(0,data.lastIndexOf(')'));
         e.setBody(data);
-        
+
         return e;
     }
-    
-    
+
     /**
      * Download the exact content of the full email message.
      *
@@ -216,7 +215,7 @@ public class ImapReader {
     public String downloadMessage(int id) throws IOException {
         StringBuffer content=new StringBuffer();
         String line;
-        
+
         write("fetch "+id+" body[header]");
         line=readLine(); //TODO: We currently ignore response line!
         line=readLine();
@@ -246,9 +245,9 @@ public class ImapReader {
 
         return data;
     }
-    
+
     private Pattern existcheck=Pattern.compile(".*\\* (\\d+) EXIST.*");
-    
+
     /**
      * Select a particular mail box for reading. Once selected, use the
      * readMail() command to read the messages in this folder.
@@ -259,7 +258,7 @@ public class ImapReader {
         write("select "+email);
         String line=readLine();
         int count=0;
-        
+
         //write("fetch "+1+" body[text]");
         //line=readLine();
         while(line.charAt(0)=='*') {
@@ -269,10 +268,10 @@ public class ImapReader {
             }
             line=readLine();
         }
-        
+
         return count;
     }
-    
+
     /**
      * Once all actions are completed, logout is called to disconnect from
      * the server.
@@ -285,7 +284,7 @@ public class ImapReader {
         }
         disconnect();
     }
-    
+
     /**
      * Cleanup all connections and data when complete
      */
@@ -295,12 +294,12 @@ public class ImapReader {
             if(outStream!=null) { outStream.close(); outStream=null; }
             if(reader!=null) { reader.close(); reader=null; }
             if(imap!=null) { imap.close(); imap=null; }
-            
+
         } catch(IOException e) { }
     }
-    
+
     private String lastCommand="";
-    
+
     /**
      * Sent a command to the server
      */
@@ -316,7 +315,7 @@ public class ImapReader {
         }
         //System.out.println("--> J"+command+" "+cmd);
     }
-    
+
     /**
      * Read response from the server
      */
@@ -336,5 +335,5 @@ public class ImapReader {
             throw e;
         }
     }
-    
+
 }

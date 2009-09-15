@@ -7,7 +7,7 @@ public class MailTest {
     int result;
 
     System.out.println("Test started");
-    
+
     if(m.testConnection()==0) {
         System.out.println("Connection to mailserver available");
     }
@@ -25,7 +25,7 @@ public class MailTest {
     if(result>0) {
         System.err.println(m.getError());
     }
-    
+
     result=m.sendMails("bob@unimelb.edu.au","jrhoden@unimelb.edu.au,ea-architecture@unimelb.edu.au","test1","content");
     if(result>0) {
         System.err.println(m.getError());
@@ -35,4 +35,4 @@ public class MailTest {
 
     }
 
-  }
+}

@@ -12,7 +12,7 @@ import java.util.regex.*;
  * email address. Currenlty only supports english language messages.
  */
 public class EmailAddress {
-    
+
   /*
    * Here are the precompiled regular expressoins used to aide
    * validation of email addresses.

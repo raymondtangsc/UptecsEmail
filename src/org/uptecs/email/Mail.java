@@ -66,7 +66,7 @@ public class Mail {
 		auth_username=null;
 		auth_password=null;
 		auth_enabled=false;
-	}  
+	}
 
 	/*
 	 * Used to retrive the error message related generated due
@@ -105,7 +105,7 @@ public class Mail {
 		}
 
 		return retval;
-	}  
+	}
 
 	public int sendHtmlMail(String from, String to, String subject,
 			String content) {
@@ -260,7 +260,7 @@ public class Mail {
 				ps.println("From: \""+from_name+"\" <"+from_email+">");
 			}
 			else {
-				ps.println("From: "+from_email);            
+				ps.println("From: "+from_email);
 			}
 			ps.println("Subject: "+subject);
 			if(to_name.length()>0) {

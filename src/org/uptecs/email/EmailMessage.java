@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * Holds contents of an email message.
  */
 public class EmailMessage {
-    
+
     private String from="";
     private String to="";
     private String content="";
@@ -22,7 +22,7 @@ public class EmailMessage {
     public void setFrom(String email) {
         from=email;
     }
-    
+
     public String getFrom() {
         return from;
     }
@@ -30,7 +30,7 @@ public class EmailMessage {
     public void setSubject(String s) {
         subject=s;
     }
-    
+
     public String getSubject() {
         return subject;
     }
@@ -38,15 +38,15 @@ public class EmailMessage {
     public void setTo(String email) {
         to=email;
     }
-    
+
     public String getTo() {
         return to;
     }
-    
+
     public void setBody(String body) {
         content=body;
     }
-    
+
     private Pattern hmatch=Pattern.compile("([a-zA-Z\\-]+):[ \\t]*(.*)");
     public void setHeaders(String headers) {
         String t[]=headers.split("[\n\r]");

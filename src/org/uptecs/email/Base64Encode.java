@@ -83,13 +83,13 @@ public class Base64Encode {
     public static void encode(InputStream in, OutputStream out)
     throws IOException {
         int[] inBuffer = new int[3];
-        
+
         boolean done = false;
         while (!done && (inBuffer[0] = in.read()) != END_OF_INPUT){
             // Fill the buffer
             inBuffer[1] = in.read();
             inBuffer[2] = in.read();
-            
+
             /*
              * The first byte of input is valid but must check other two bytes
              * are not equal to END_OF_INPUT. Each set of three bytes add up to
@@ -99,7 +99,7 @@ public class Base64Encode {
              * If there are not enough bytes to make a 24 bit group, the
              * remaining ascii characters are converted to the = character.
              */
-            
+
             // Byte 1: first six bits of first byte
             out.write(lookupMap[inBuffer[0]>>2 ]);
             if (inBuffer[1]!=END_OF_INPUT){
@@ -127,6 +127,6 @@ public class Base64Encode {
             }
         }
         out.flush();
-    }  
-    
+    }
+
 }
