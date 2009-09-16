@@ -42,6 +42,19 @@ The following demonstrates how to fetch all mail from an inbox.
 </p>
 
 <pre>
+    ImapReader imap=new ImapReader();
+    imap.setHostname("example.com");
+    imap.setUsername("username");
+    imap.setPassword("password");
+
+    imap.connect();
+    int count=imap.readMailbox("INBOX");
+    System.out.println("Found "+count+" emails.");
+    for(int x=1;x<=count;x++) {
+    	String message=imap.downloadMessage(x);
+        // do something with message
+	}
+    imap.logout();
 </pre>
 
 </body>
