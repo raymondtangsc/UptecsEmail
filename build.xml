@@ -34,7 +34,6 @@
 	<target name="clean" description="Removes previous build">
 		<delete verbose="true" includeemptydirs="true">
 			<fileset dir="${build}"/>
-			<fileset dir="${dist}"/>
 			<fileset dir="${docs}"/>
 		</delete>
 	</target>
