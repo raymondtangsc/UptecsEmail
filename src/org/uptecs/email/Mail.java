@@ -223,7 +223,7 @@ public class Mail {
 			}
 		}
 
-		EmailAddress etest=new EmailAddress();
+		EmailAddressParse etest=new EmailAddressParse();
 		if(!etest.isValid(from_email)) { error=etest.getError(); return 1; }
 		if(!etest.isValid(to_email)) { error=etest.getError(); return 1; }
 

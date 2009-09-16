@@ -31,13 +31,88 @@ THE POSSIBILITY OF SUCH DAMAGE.
 package org.uptecs.email;
 
 import java.util.regex.*;
+import java.util.*;
 
-/**
- * Used to verify the validity of an email address. Provides the ability
- * to retrieve an informative message describing the problem with the
- * email address. Currenlty only supports english language messages.
- */
-public class EmailAddress {
+public class EmailAddressParse {
+
+	public String[] parse(String line) {
+
+		List<String> parts = new ArrayList<String>();
+		String part = "";
+		int mode = 0;
+		char escapeType = 0;
+		for(int i=0;i<line.length();i++) {
+			char c = line.charAt(i);
+			switch(mode) {
+				case 0 :
+					if(c==' ' || c=='\t' || c=='\n' || c==',') {
+						if(part.length()>0)
+							parts.add(part);
+						part = "";
+						continue;
+					}
+					if(c=='<' || c=='"' || c=='\'') {
+						if(c=='<' && part.length()>0) {
+							parts.add(part);
+							part = "";
+						}
+						escapeType=c;
+						if(c=='<') escapeType='>';
+						mode=1;
+						continue;
+					}
+					part=part+c;
+					break;
+				case 1 :
+					if(c==escapeType) {
+						if(c=='>' && part.length()>0) {
+							parts.add(part);
+							part = "";
+						}
+						mode = 0;
+						continue;
+					}
+					part=part+c;
+					break;
+			}
+		}
+		if(part.length()>0)
+			parts.add(part);
+
+		List<String> addresses = new ArrayList<String>();
+		String name = "";
+		for(String bit : parts) {
+			if(bit.contains("@")) {
+				if(name == "")
+					addresses.add(bit);
+				else
+					addresses.add("\""+name+"\" <"+bit+">"); 
+				name = "";
+			} else {
+				if(name == "")
+					name = bit;
+				else
+					name = name + " " + bit;
+			}
+		}
+		return addresses.toArray(new String[0]);
+	}
+
+	public static void main(String[] arg) {
+
+		EmailAddressParse parser = new EmailAddressParse();
+		String[] list = parser.parse(
+				"bob@home.com, "+
+				"\"Jane Smith\" <jane@home.com>, "+
+				"\"John O'hare\" <john@home.com>,"+
+				"Clara Rhoden <clara@home.com>,"+
+				"Clara@rhoden.com,"+
+				"'bob smith' bob@home.com"+
+				"");
+		for(String item : list)
+			System.out.println(" - "+item);
+
+	}
 
   /*
    * Here are the precompiled regular expressoins used to aide
