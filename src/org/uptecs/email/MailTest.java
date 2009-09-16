@@ -33,7 +33,7 @@ package org.uptecs.email;
 public class MailTest {
 
   public static void main(String[] a) {
-    Mail m=new Mail("rhoden.id.au");
+    Mail m=new Mail("smtp.example.com");
     int result;
 
     System.out.println("Test started");
@@ -45,18 +45,18 @@ public class MailTest {
         System.out.println("Problem with specified mailserver: "+m.getError());
     }
 
-    m.enableAuthentication("jacob@rhoden.id.au","gsmarti");
-    result=m.sendMail("jrhoden@unimelb.edu.au","jrhoden@unimelb.edu.au","test2","content2");
+    m.enableAuthentication("jacob@example.com","password");
+    result=m.sendMail("bob@example.com","jane@example.com","My subject","content2");
     if(result>0) {
         System.err.println(m.getError());
     }
 
-    result=m.sendMail("jrhodenunimelb.edu.au","jrhoden@unimelb.edu.au","test2","content2");
+    result=m.sendMail("xiongmao@example.com","gou@example.com","Another subject","content2");
     if(result>0) {
         System.err.println(m.getError());
     }
 
-    result=m.sendMails("bob@unimelb.edu.au","jrhoden@unimelb.edu.au,ea-architecture@unimelb.edu.au","test1","content");
+    result=m.sendMails("bob@example.com","person1@example.com,person2@example.com","test1","content");
     if(result>0) {
         System.err.println(m.getError());
     }

@@ -46,9 +46,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Basc class to allow sending of mail. Note this feature is custom written
- * because this facility does not always work out of the box on all systems.
- * This sender is based upon/compliant with RFC 821 and RFC 2822.
+ * Deliver an email message via an SMTP server. Note this feature is
+ * custom written because this facility does not always work out of
+ * the box on all systems. Based upon but not fully tested against
+ * RFC 821 and RFC 2822.
  */
 public class Mail {
 
@@ -106,8 +107,9 @@ public class Mail {
 	}
 
 	/*
-	 * Send and email to multiple addresses in plain text format, no html or mime
-	 * encoding. Specify multiple addresses in the to field separated by a comma.
+	 * Send and email to multiple addresses in plain text format, no html
+	 * or mime encoding. Specify multiple addresses in the to field
+	 * separated by a comma.
 	 *
 	 * @param from Sender email address.
 	 * @param to Destination email addresses separated by a comma.

@@ -30,7 +30,10 @@ THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.uptecs.email;
 
-
+/**
+ * Encapsulates an email address, optionally includes a name for
+ * the person owning the email address.
+ */
 public class EmailAddress {
 
 	private String name;

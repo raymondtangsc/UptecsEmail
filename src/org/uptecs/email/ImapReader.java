@@ -39,7 +39,7 @@ import javax.net.*;
 import javax.net.ssl.*;
 
 /**
- * Provides basic access to an IMAP account, without
+ * Provides basic access to an IMAP account, without requring learning
  * a huge chunky library. Example usage:
  * <pre>
  * ImapReader i=new ImapReader();
