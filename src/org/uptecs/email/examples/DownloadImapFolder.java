@@ -45,26 +45,30 @@ import org.uptecs.email.ImapReader;
  *
  */
 public class DownloadImapFolder {
-	
+
 	private ImapReader imap;
-	
+
 	/** Creates a new instance of DownloadImapFolder */
 	public DownloadImapFolder() {
 	}
-	
+
+	/**
+	 * Given a particular imap server, username, and password, store all
+	 * of the emails from the inbox into a file called mail.txt
+	 */
 	public static void main(String[] arg) {
 		DownloadImapFolder d=new DownloadImapFolder();
 		d.setParameters(arg[0], arg[1], arg[2]);
 		d.download("mail.txt");
 	}
-	
+
 	public void setParameters(String ihost, String iuser, String ipassword) {
 		imap=new ImapReader();
 		imap.setHostname(ihost);
 		imap.setUsername(iuser);
 		imap.setPassword(ipassword);
 	}
-	
+
 	public void download(String filename) {
 		try {
 			File f=new File(filename);

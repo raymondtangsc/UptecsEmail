@@ -84,16 +84,18 @@ public class ImapReader {
 	 *
 	 * @param u Username to provide to IMAP server.
 	 */
-	public void setUsername(String u) {
-		username=u;
+	public void setUsername(String username) {
+		if(username == null) username = "";
+		this.username=username;
 	}
 
 	/**
 	 * Specify the password to be used with this transaction.
 	 * @param p The password to use for this connection.
 	 */
-	public void setPassword(String p) {
-		password=p;
+	public void setPassword(String password) {
+		if(password == null) password = "";
+		this.password=password;
 	}
 
 	/**
