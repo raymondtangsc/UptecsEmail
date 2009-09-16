@@ -60,11 +60,23 @@ public class EmailAddress {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		if(name == null)
+			this.name = "";
+		else
+			this.name = name;
 	}
 
 	public void setAddress(String address) {
-		this.name = name;
+		if(address == null)
+			this.address = "";
+		else
+			this.address = address;
+	}
+
+	public String toString() {
+		if(name == "")
+			return address;
+		return "\"" + name + "\" <" + address + ">";
 	}
 
 }

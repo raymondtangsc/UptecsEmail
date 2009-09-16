@@ -35,7 +35,7 @@ import java.util.*;
 
 public class EmailAddressParse {
 
-	public String[] parse(String line) {
+	public EmailAddress[] parse(String line) {
 
 		List<String> parts = new ArrayList<String>();
 		String part = "";
@@ -79,14 +79,14 @@ public class EmailAddressParse {
 		if(part.length()>0)
 			parts.add(part);
 
-		List<String> addresses = new ArrayList<String>();
+		List<EmailAddress> addresses = new ArrayList<EmailAddress>();
 		String name = "";
 		for(String bit : parts) {
 			if(bit.contains("@")) {
 				if(name == "")
-					addresses.add(bit);
+					addresses.add(new EmailAddress(bit));
 				else
-					addresses.add("\""+name+"\" <"+bit+">"); 
+					addresses.add(new EmailAddress(name,bit)); 
 				name = "";
 			} else {
 				if(name == "")
@@ -95,22 +95,24 @@ public class EmailAddressParse {
 					name = name + " " + bit;
 			}
 		}
-		return addresses.toArray(new String[0]);
+		return addresses.toArray(new EmailAddress[0]);
 	}
 
 	public static void main(String[] arg) {
 
 		EmailAddressParse parser = new EmailAddressParse();
-		String[] list = parser.parse(
+		EmailAddress[] list = parser.parse(
 				"bob@home.com, "+
 				"\"Jane Smith\" <jane@home.com>, "+
 				"\"John O'hare\" <john@home.com>,"+
 				"Clara Rhoden <clara@home.com>,"+
+				"Bob, Pty ltd <bob@bob.com>"+
+				"\"Jane, Pty ltd\" <jane@jane.com>"+
 				"Clara@rhoden.com,"+
 				"'bob smith' bob@home.com"+
 				"");
-		for(String item : list)
-			System.out.println(" - "+item);
+		for(EmailAddress item : list)
+			System.out.println(" - "+item.toString());
 
 	}
 
