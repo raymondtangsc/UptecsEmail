@@ -8,12 +8,27 @@ The email library provides a quick and easy way to both send and receive email u
 
 <h2>Sending email via SMTP</h2>
 
+<h3>Testing an SMTP server</h3>
+<p>
+The following code demonstrates testing a connection to an SMTP server.
+</p>
+
+<pre>
+    Mail m=new Mail("smtp.example.com");
+    if(m.testConnection()!=0)
+        System.out.println("Problem with specified mailserver: "+m.getError());
+</pre>
+
 <h3>Basic sending an email</h3>
 <p>
 The following demonstrates the most basic usage of sending mail.
 </p>
 
 <pre>
+    Mail m=new Mail("smtp.example.com");
+    int result=m.sendMail("bob@example.com","jane@example.com","My subject","content2");
+    if(result>0)
+        System.err.println(m.getError());
 </pre>
 
 <h3>Authenticated sending an email</h3>
@@ -23,6 +38,16 @@ server before attempting to send an email.
 </p>
 
 <pre>
+    Mail m=new Mail("smtp.example.com");
+    m.enableAuthentication("jacob@example.com","password");
+    int result=m.sendMail(
+		"bob@example.com",
+		"jane@example.com",
+		"My subject",
+		"content2");
+    if(result>0)
+        System.err.println(m.getError());
+</pre>
 </pre>
 
 <h3>Sending an email with text and html versions</h3>
