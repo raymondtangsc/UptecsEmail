@@ -200,6 +200,9 @@ public class Mail {
 		String response=null;
 		String datestamp="";
 
+		alt = cleanLines(alt);
+		content = cleanLines(content);
+
 		Format dformat=new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
 		datestamp=dformat.format(new Date());
 
@@ -328,7 +331,6 @@ public class Mail {
 				ps.println(content);
 				ps.println("");
 			}
-			
 
 			ps.println("."); ps.flush();
 			response=dis.readLine();
@@ -389,4 +391,54 @@ public class Mail {
 		return 0;
 	}
 
+	private int countSubstring(String content, String substring) {
+		int index = -1;
+		int total = 0;
+		while(true) {
+			if(index == -1)
+				index = content.indexOf(substring);
+			else
+				index = content.indexOf(substring, index);
+			if(index == -1)
+				break;
+			total++;
+			index += substring.length();
+		}
+		return total;
+	}
+
+	private String trimCrlf(String line) {
+		while(line.endsWith("\n") || line.endsWith("\r"))
+			line = line.substring(0,line.length()-1);
+		while(line.startsWith("\n") || line.startsWith("\r"))
+			line = line.substring(1,line.length()-1);
+		return line;
+	}
+
+	private String cleanLines(String message) {
+		if(message == null || message == "")
+			return message;
+
+		int crlfCount = countSubstring(message, "\r\n");
+		int crCount = countSubstring(message, "\r");
+		int lfCount = countSubstring(message, "\n");
+		String splitBy = "\n";
+
+		if(crlfCount > crCount && crlfCount > lfCount)
+			splitBy = "\r\n";
+		if(crCount > crlfCount && crCount > lfCount)
+			splitBy = "\r";
+		if(lfCount > crCount && lfCount > crlfCount)
+			splitBy = "\n";
+
+		StringBuffer result = new StringBuffer();
+		for(String line : message.split(splitBy)) {
+			line = trimCrlf(line);
+			if(line.matches("^\\.+$")) line = line + ".";
+			result.append(line);
+			result.append("\r\n");
+		}
+
+		return result.toString();
+	}
 }
