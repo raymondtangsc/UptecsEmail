@@ -62,7 +62,7 @@ The following demonstrates the most basic usage of sending mail.
 
 <pre>
     Mail m=new Mail("smtp.example.com");
-    int result=m.sendMail("bob@example.com","jane@example.com","My subject","content2");
+    int result=m.sendMail("bob@example.com","jane@example.com","My subject","Email mesage");
     if(result>0)
         System.err.println(m.getError());
 </pre>
@@ -80,7 +80,7 @@ server before attempting to send an email.
 		"bob@example.com",
 		"jane@example.com",
 		"My subject",
-		"content2");
+		"Message contents");
     if(result>0)
         System.err.println(m.getError());
 </pre>
