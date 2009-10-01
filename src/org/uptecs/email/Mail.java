@@ -45,6 +45,9 @@ import java.lang.Math;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.uptecs.email.encoding.Encoding;
+import org.uptecs.email.encoding.PlainTextEncoding;
+
 /**
  * Deliver an email message via an SMTP server. Note this feature is
  * custom written because this facility does not always work out of
@@ -200,8 +203,9 @@ public class Mail {
 		String response=null;
 		String datestamp="";
 
-		alt = cleanLines(alt);
-		content = cleanLines(content);
+		Encoding plainText = new PlainTextEncoding();
+		alt = plainText.encode(alt);
+		content = plainText.encode(content);
 
 		Format dformat=new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
 		datestamp=dformat.format(new Date());
@@ -391,54 +395,4 @@ public class Mail {
 		return 0;
 	}
 
-	private int countSubstring(String content, String substring) {
-		int index = -1;
-		int total = 0;
-		while(true) {
-			if(index == -1)
-				index = content.indexOf(substring);
-			else
-				index = content.indexOf(substring, index);
-			if(index == -1)
-				break;
-			total++;
-			index += substring.length();
-		}
-		return total;
-	}
-
-	private String trimCrlf(String line) {
-		while(line.endsWith("\n") || line.endsWith("\r"))
-			line = line.substring(0,line.length()-1);
-		while(line.startsWith("\n") || line.startsWith("\r"))
-			line = line.substring(1,line.length()-1);
-		return line;
-	}
-
-	private String cleanLines(String message) {
-		if(message == null || message == "")
-			return message;
-
-		int crlfCount = countSubstring(message, "\r\n");
-		int crCount = countSubstring(message, "\r");
-		int lfCount = countSubstring(message, "\n");
-		String splitBy = "\n";
-
-		if(crlfCount > crCount && crlfCount > lfCount)
-			splitBy = "\r\n";
-		if(crCount > crlfCount && crCount > lfCount)
-			splitBy = "\r";
-		if(lfCount > crCount && lfCount > crlfCount)
-			splitBy = "\n";
-
-		StringBuffer result = new StringBuffer();
-		for(String line : message.split(splitBy)) {
-			line = trimCrlf(line);
-			if(line.matches("^\\.+$")) line = line + ".";
-			result.append(line);
-			result.append("\r\n");
-		}
-
-		return result.toString();
-	}
 }
