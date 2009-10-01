@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 
 import org.uptecs.email.encoding.Encoding;
 import org.uptecs.email.encoding.PlainTextEncoding;
+import org.uptecs.email.encoding.QuotedPrintableEncoding;
 
 /**
  * Deliver an email message via an SMTP server. Note this feature is
@@ -203,10 +204,6 @@ public class Mail {
 		String response=null;
 		String datestamp="";
 
-		Encoding plainText = new PlainTextEncoding();
-		alt = plainText.encode(alt);
-		content = plainText.encode(content);
-
 		Format dformat=new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
 		datestamp=dformat.format(new Date());
 
@@ -311,6 +308,12 @@ public class Mail {
 			}
 
 			if(alt.length()>0) {
+				Encoding quotedPrintable = new QuotedPrintableEncoding();
+				content = quotedPrintable.encode(content);
+
+				Encoding plainText = new PlainTextEncoding();
+				alt = plainText.encode(alt);
+
 				String boundary=String.valueOf(Math.abs(generator.nextLong()));
 				ps.println("Content-type: multipart/alternative; charset=UTF-8;  boundary="+boundary);
 				ps.println("Mime-Version: 1.0");
@@ -324,7 +327,7 @@ public class Mail {
 				ps.println("");
 				ps.println("--"+boundary);
 				ps.println("Content-Type: text/html; charset=utf-8");
-				ps.println("Content-Transfer-Encoding: 8bit");
+				ps.println("Content-Transfer-Encoding: quoted-printable");
 				ps.println("Content-Disposition: inline");
 				ps.println("");
 				ps.println(content);
@@ -332,6 +335,8 @@ public class Mail {
 				ps.println("--"+boundary+"--");
 			} else {
 				ps.println("");
+				Encoding plainText = new PlainTextEncoding();
+				content = plainText.encode(content);
 				ps.println(content);
 				ps.println("");
 			}
