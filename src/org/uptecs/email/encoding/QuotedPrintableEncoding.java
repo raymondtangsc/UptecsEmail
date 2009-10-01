@@ -46,29 +46,34 @@ public class QuotedPrintableEncoding extends Encoding{
 
 		Encoding plain = new PlainTextEncoding();
 		message = plain.encode(message);
-		message = message.replace("=", "=3D");
 
+		int lineLength = 0;
 		StringBuilder body = new StringBuilder();
-		List<String> lines = new ArrayList<String>();
-		for(String line : message.split("\r\n"))
-			lines.add(line);
-
-		while(lines.size()>0) {
-			String line = lines.remove(0);
-
-			if(line.length()>80) {
-				int splitpoint = findSplitpoint(line,79);
-				String part1=line.substring(0,splitpoint);
-				String part2=line.substring(splitpoint);
-				body.append(part1);
-				body.append("=\r\n");
-				lines.add(0,part2);
+		for(int i=0;i<message.length();i++) {
+			char c = message.charAt(i);
+			if(c==13 || c==10) lineLength=0;
+			else lineLength++;
+			if((c>127 && c<256)||c<10||c=='=') {
+				if(lineLength>74) {
+					body.append("=\r\n");
+					lineLength = 0;
+				}
+				if(c>15)
+					body.append("="+Integer.toHexString(c).toUpperCase());
+				else {
+					body.append("=0"+Integer.toHexString(c).toUpperCase());
+				}
+				lineLength+=2;
 			} else {
-				body.append(line);
-				body.append("\r\n");
+				if(lineLength>76) {
+					body.append("=\r\n");
+					lineLength = 0;
+				}
+				body.append(c);
 			}
+				
 		}
-		
+
 		return body.toString();
 	}
 
