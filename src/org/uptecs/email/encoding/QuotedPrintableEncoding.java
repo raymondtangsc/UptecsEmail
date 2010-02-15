@@ -30,9 +30,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.uptecs.email.encoding;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class QuotedPrintableEncoding extends Encoding{
 
 	/**
@@ -71,21 +68,10 @@ public class QuotedPrintableEncoding extends Encoding{
 				}
 				body.append(c);
 			}
-				
+
 		}
 
 		return body.toString();
 	}
 
-	private int findSplitpoint(String line, int maxLength) {
-		if(line.length()<maxLength) return line.length();
-		
-		if(line.charAt(maxLength-1)=='=')
-			return maxLength-1;
-		if(line.charAt(maxLength-2)=='=')
-			return maxLength-2;
-
-		return maxLength;
-	}
-	
 }
