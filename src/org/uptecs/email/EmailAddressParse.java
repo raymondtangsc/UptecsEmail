@@ -6,15 +6,15 @@ modification, are permitted provided that the following conditions
 are met:
 
  * Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
+notice, this list of conditions and the following disclaimer.
  * Redistributions in binary form must reproduce the above
-   copyright notice, this list of conditions and the following
-   disclaimer in the documentation and/or other materials provided
-   with the distribution.
+copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided
+with the distribution.
  * Neither the name of the Uptecs nor the names of its
-   contributors may be used to endorse or promote products
-   derived from this software without specific prior written
-   permission.
+contributors may be used to endorse or promote products
+derived from this software without specific prior written
+permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -86,7 +86,7 @@ public class EmailAddressParse {
 				if(name == "")
 					addresses.add(new EmailAddress(bit));
 				else
-					addresses.add(new EmailAddress(name,bit)); 
+					addresses.add(new EmailAddress(name,bit));
 				name = "";
 			} else {
 				if(name == "")
@@ -98,36 +98,15 @@ public class EmailAddressParse {
 		return addresses.toArray(new EmailAddress[0]);
 	}
 
-	public static void main(String[] arg) {
-
-		EmailAddressParse parser = new EmailAddressParse();
-		EmailAddress[] list = parser.parse(
-				"bob@home.com, "+
-				"\"Jane Smith\" <jane@home.com>, "+
-				"\"John O'hare\" <john@home.com>,"+
-				"Clara Rhoden <clara@home.com>,"+
-				"Bob, Pty ltd <bob@bob.com>"+
-				"\"Jane, Pty ltd\" <jane@jane.com>"+
-				"Clara@rhoden.com,"+
-				"'bob smith' bob@home.com"+
-				"");
-		for(EmailAddress item : list)
-			System.out.println(" - "+item.toString());
-
-	}
 
 	/*
 	 * Here are the precompiled regular expressoins used to aide
 	* validation of email addresses.
 	*/
-	private static Pattern charCheck;
-	private static Pattern partCheck;
-	private static Pattern numberCheck;
-	static {
-		charCheck=Pattern.compile(".*([\\\\\\/\\*\\&\\(\\)\\!\\#\\$\\%\\^\\~\\`\\{\\}\\;\\:\\\"\\,\\<\\>\\?\\[\\]\\=\\|]).*");
-		partCheck=Pattern.compile("([^@]+)@([^@]+)");
-		numberCheck=Pattern.compile(".*\\d.*");
-	}
+	private static Pattern invalidNameCharacters = Pattern.compile(".*([\\\\\\/\\*\\&\\(\\)\\!\\#\\$\\%\\^\\~\\`\\{\\}\\;\\:\\\"\\,\\<\\>\\?\\[\\]\\=\\|]).*");
+	private static Pattern partCheck = Pattern.compile("([^@]+)@([^@]+)");
+	private static Pattern numberCheck = Pattern.compile(".*\\d.*");
+	private static Pattern invalidDomainNameCharacters = Pattern.compile(".*([\\\\\\/\\*\\&\\(\\)\\!\\#\\$\\%\\^\\~\\`\\{\\}\\;\\:\\\"\\,\\<\\>\\?\\[\\]\\'\\=\\|]).*");
 
 	/*
 	 * Contains an error if a problem occured with the most recent
@@ -166,9 +145,46 @@ public class EmailAddressParse {
 			return false;
 		}
 
-		Matcher m=charCheck.matcher(email);
+		Matcher m=partCheck.matcher(email);
+		if(!m.matches()) {
+			error="Email address must contain a single @ in the middle";
+			return false;
+		}
+
+		String name=m.group(1);
+		String domain=m.group(2);
+		String[] domainParts=domain.split("\\.");
+
+		if(domainParts.length<=1) {
+			error="Your email domain is incomplete.\n";
+			return false;
+		}
+
+		if(domainParts[domainParts.length-1].length()<2) {
+			error="Email domain appears to be invalid.";
+			return false;
+		}
+
+		if(domainParts[domainParts.length-1].length()>4) {
+			error="Email domain appears to be invalid.";
+			return false;
+		}
+
+		m=numberCheck.matcher(domainParts[domainParts.length-1]);
 		if(m.matches()) {
-			error="The "+m.group(1)+" character may not be used in an email address.";
+			error="Email domain appears to be invalid.";
+			return false;
+		}
+
+		m=invalidDomainNameCharacters.matcher(domain);
+		if(m.matches()) {
+			error="The "+m.group(1)+" character may not be used in the domain name part of an email address.";
+			return false;
+		}
+
+		m=invalidNameCharacters.matcher(name);
+		if(m.matches()) {
+			error="The "+m.group(1)+" character may not be used in the name part of an email address.";
 			return false;
 		}
 
@@ -179,37 +195,6 @@ public class EmailAddressParse {
 
 		if(email.indexOf(" ")>=0) {
 			error="Email address should not contain a space.";
-			return false;
-		}
-
-		m=partCheck.matcher(email);
-		if(!m.matches()) {
-			error="Email address must contain a single @ in the middle";
-			return false;
-		}
-
-		//String upart=m.group(1);
-		String mpart=m.group(2);
-		String[] mparts=mpart.split("\\.");
-
-		if(mparts.length<=1) {
-			error="Your email domain is incomplete.\n";
-			return false;
-		}
-
-		if(mparts[mparts.length-1].length()<2) {
-			error="Email domain appears to be invalid.";
-			return false;
-		}
-
-		if(mparts[mparts.length-1].length()>4) {
-			error="Email domain appears to be invalid.";
-			return false;
-		}
-
-		m=numberCheck.matcher(mparts[mparts.length-1]);
-		if(m.matches()) {
-			error="Email domain appears to be invalid.";
 			return false;
 		}
 
