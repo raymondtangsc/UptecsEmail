@@ -124,7 +124,7 @@ public class EmailAddressParse {
 	private static Pattern partCheck;
 	private static Pattern numberCheck;
 	static {
-		charCheck=Pattern.compile(".*([\\\\\\/\\*\\&\\(\\)\\!\\#\\$\\%\\^\\~\\`\\{\\}\\;\\:\\\"\\'\\,\\<\\>\\?\\[\\]\\=\\|]).*");
+		charCheck=Pattern.compile(".*([\\\\\\/\\*\\&\\(\\)\\!\\#\\$\\%\\^\\~\\`\\{\\}\\;\\:\\\"\\,\\<\\>\\?\\[\\]\\=\\|]).*");
 		partCheck=Pattern.compile("([^@]+)@([^@]+)");
 		numberCheck=Pattern.compile(".*\\d.*");
 	}
