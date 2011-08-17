@@ -30,11 +30,15 @@ THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.uptecs.email;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.InetAddress;
+import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +66,7 @@ public class Mail {
 	private String error="";
 	private static Random generator=null;
 	static { generator=new Random(); }
+	private int timeout = 10000;
 
 	public Mail(String host,int port) {
 		this.host=host;
@@ -76,7 +81,7 @@ public class Mail {
 	String auth_password=null;
 	boolean auth_enabled=false;
 
-	/*
+	/**
 	 * Attempt to authenticate to the mail server, primarily used to enable
 	 * relaying of email where required.
 	 *
@@ -89,7 +94,7 @@ public class Mail {
 		auth_enabled=true;
 	}
 
-	/*
+	/**
 	 * Disable attempting to authenticate with mail server.
 	 */
 	public void disableAuthentication() {
@@ -98,7 +103,7 @@ public class Mail {
 		auth_enabled=false;
 	}
 
-	/*
+	/**
 	 * Used to retrive the error message related generated due
 	 * to failure of sendMail() function.
 	 *
@@ -110,7 +115,23 @@ public class Mail {
 		return e2;
 	}
 
-	/*
+	/**
+	 * Specify maximum length of time in milliseconds to wait for an SMTP server to respond. Default is ten seconds.
+	 * @param timeout Maximum wait time in milliseconds
+	 */
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+	/**
+	 * The maximum length of time to wait for an SMTP server to respond
+	 * @return Maximum wait time in milliseconds
+	 */
+	public int getTimeout() {
+		return timeout;
+	}
+
+	/**
 	 * Send and email to multiple addresses in plain text format, no html
 	 * or mime encoding. Specify multiple addresses in the to field
 	 * separated by a comma.
@@ -156,7 +177,7 @@ public class Mail {
 		return sendMail(from,to,subject,content,headers,alt);
 	}
 
-	/*
+	/**
 	 * Send a message in plain text format, no html or mime encoding
 	 *
 	 * @param from Sender email address.
@@ -171,7 +192,7 @@ public class Mail {
 		return sendMail(from,to,subject,content,(List<String>)null,"");
 	}
 
-	/*
+	/**
 	 * Send a message in plain text format, no html or mime encoding
 	 *
 	 * @param from Sender email address.
@@ -187,7 +208,7 @@ public class Mail {
 
 	}
 
-	/*
+	/**
 	 * Send a message in plain text format, no html or mime encoding
 	 *
 	 * @param from Sender email address.
@@ -198,8 +219,7 @@ public class Mail {
 	 *
 	 * @return 0 if successful, otherwise error number returned.
 	 */
-	public int sendMail(String from, String to, String subject,
-			String content, List<String> headers, String alt) {
+	public int sendMail(String from, String to, String subject, String content, List<String> headers, String alt) {
 		Socket socket=null;
 		String response=null;
 		String datestamp="";
@@ -234,12 +254,18 @@ public class Mail {
 		if(!etest.isValid(to_email)) { error=etest.getError(); return 1; }
 
 		try {
-			socket = new Socket(host, port);
-		}
-		catch(Exception e) {
-			error="Cannot connect to specified mail server";
+			SocketAddress sockaddr = new InetSocketAddress(host, port);
+			socket = new Socket();
+			socket.setSoTimeout(timeout);
+			socket.connect(sockaddr, timeout);
+		} catch(SocketTimeoutException e) {
+			error="Timeout while connecting to mail server";
+			return 2;
+		} catch(IOException e) {
+			error="Unable to connect to mail server";
 			return 1;
 		}
+
 		try {
 			InetAddress lina=InetAddress.getLocalHost();
 			PrintStream ps=new PrintStream(socket.getOutputStream());
@@ -349,8 +375,11 @@ public class Mail {
 			response=dis.readLine();
 			if(response.indexOf("221 ")!=0) { error=response; return 1; }
 
-		}
-		catch (Exception ex) {
+		} catch(SocketTimeoutException e) {
+			error="Timeout while waiting for response from to mail server";
+			try{socket.close();}catch(Exception f) {}
+			return 4;
+		}catch (Exception ex) {
 			error="Problem communicating with mail server";
 			try{socket.close();}catch(Exception e) {}
 			return 2;
@@ -359,7 +388,7 @@ public class Mail {
 		return 0;
 	}
 
-	/*
+	/**
 	 * Used to test connection and communication with the specified mail server.
 	 * Will report if a connection can not be established with the mail server
 	 * or if the mailserver does not reply with content a mail server should reply
@@ -372,12 +401,18 @@ public class Mail {
 		String response=null;
 
 		try {
-			socket = new Socket(host, port);
-		}
-		catch(Exception e) {
-			error="Cannot connect to specified mail server";
+			SocketAddress sockaddr = new InetSocketAddress(host, port);
+			socket = new Socket();
+			socket.setSoTimeout(timeout);
+			socket.connect(sockaddr, timeout);
+		} catch(SocketTimeoutException e) {
+			error="Timeout while connecting to mail server";
+			return 3;
+		} catch(IOException e) {
+			error="Unable to connect to mail server";
 			return 1;
 		}
+
 		try {
 			PrintStream ps=new PrintStream(socket.getOutputStream());
 			InputStreamReader dd=new InputStreamReader(socket.getInputStream());
@@ -390,10 +425,13 @@ public class Mail {
 			response=dis.readLine();
 			if(response.indexOf("221 ")!=0) { error=response; return 1; }
 
-		}
-		catch (Exception ex) {
-			error="Problem communicating with mail server";
-			try{socket.close();}catch(Exception e) {}
+		} catch(SocketTimeoutException e) {
+			error="Timeout while waiting for response from to mail server";
+			try{socket.close();}catch(Exception f) {}
+			return 4;
+		} catch (Exception e) {
+			error="Problem communicating with mail server. " + e.getMessage();
+			try{socket.close();}catch(Exception f) {}
 			return 2;
 		}
 
